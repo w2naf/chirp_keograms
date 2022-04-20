@@ -50,16 +50,16 @@ freqlist = [60, 80, 100, 120, 160, 180]
 
 
 # folder where the lfm files exist
-rootdir = '/media/kc3pve/Seagate Backup Plus Drive/chirp'
+rootdir = 'chirp'
 
 # folder within which there were dated folders where the data were saved
-output_dir1 = "/home/kc3pve/Downloads/chirp_juha2b/Plots20"
+output_dir1 = 'output'
 
 # folder where I would want to save the RTI image
-output_dir2 = "/home/kc3pve/Downloads/chirp_juha2b/Plots20/AllRTI"
+output_dir2 = "output/AllRTI"
 
 # folder where I would want to save the ionograms which have been selected and processed
-output_dir21 = "/home/kc3pve/Downloads/chirp_juha2b/Plots23"
+output_dir21 = "output/Ionograms"
 
 # the dated folders where the data are saved
 dirs = sorted(os.listdir(output_dir1))
@@ -292,7 +292,11 @@ def save_var(DataDict):
     for j, k in enumerate(reversed([j for j in DataDict['DBall'].keys()])):
         ax1 = fig.add_subplot(6, 1, j+1)
         for ja in range(0, 118):
-            plt.pcolormesh(new_times[ja:ja+2], n.column_stack((range_gatesnew[:, ja], range_gatesnew[:, ja])),DataDict['DBallnew'][k].astype(n.float)[:-1, ja:ja+1], vmin=-3, vmax=30.0,cmap="inferno")
+            xx = mpl.dates.date2num(new_times[ja:ja+2])
+            yy = ( n.column_stack((range_gatesnew[:, ja], range_gatesnew[:, ja])) ).astype(float)
+            zz = DataDict['DBallnew'][k].astype(float)[:-1, ja:ja+1]
+
+            plt.pcolormesh(xx, yy, zz, vmin=-3, vmax=30.0,cmap="inferno")
             
         cb = plt.colorbar()
         cb.set_label("SNR (dB)")
@@ -305,19 +309,20 @@ def save_var(DataDict):
     
     plt.xlabel("Time (UTC)", weight='bold', fontsize=12)
     plt.savefig(img_fname1, bbox_inches='tight')
-    plt.savefig(img_fname2, bbox_inches='tight')
+#    plt.savefig(img_fname2, bbox_inches='tight')
     plt.close()
     plt.clf()
+    import ipdb; ipdb.set_trace()
 
 
 if __name__ == "__main__":
 
         for j in range(0, len(dirs)):
             dirs1 = dirs[j]
-            dtt1 = datetime.datetime.strptime('2021-08-06','%Y-%m-%d').date()
+            dtt1 = datetime.datetime.strptime('2021-01-08','%Y-%m-%d').date()
             dtt2 = datetime.datetime.strptime(dirs1[0:10],'%Y-%m-%d').date()
 
-            if dirs1[0:10] == '2021-08-07':
+            if dirs1[0:10] == '2021-01-08':
             #dir1 = output_dir1 + '/' + dirs[j]
             #for x in os.listdir(dir1):
             #    if x.endswith("h.data"):
@@ -326,7 +331,6 @@ if __name__ == "__main__":
             #if dtt2 > dtt1 :
                     path = os.path.join(rootdir, dirs1)
                     print(dirs1)
-                    os.chdir(path)
                     fl = glob.glob("%s/lfm*.h5" % (path))
                     fl.sort()
 
